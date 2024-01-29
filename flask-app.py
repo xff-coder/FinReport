@@ -1,26 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, Response
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import subprocess
 import sqlite3
 import sys
 import os
-from datetime import datetime
-import requests
-import json
-import pandas as pd
-import numpy as np
-import statementFunct
-import styleModule
-from main_excel import StartReport
-
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 # Generate a secure random key with 32 bytes
 #secret_key = secrets.token_hex(32)
 
 app = Flask(__name__)
-#load_dotenv(dotenv_path='config.env')
-#app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
-app.secret_key = '13245634287' 
+load_dotenv(dotenv_path='config.env')
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
   # Replace with a secret key for session security
 
 # Set up SQLite database
@@ -55,15 +45,11 @@ cursor.execute('''
 
 conn.commit()
 conn.close()
-    
+
 # Routes
 @app.route('/')
 def index():
     return render_template('header.html', title='Homepage') + render_template('index.html', message='')
-
-@app.route('/about')
-def about():
-    return render_template('header.html', title='Homepage') + render_template('homepage.html')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -125,30 +111,41 @@ def generate_file(userid):
     end_year = request.form.get('end_year')
     statement_types = request.form.getlist('statement_types')
 
-    app.logger.info(f"User {userid} generated a file for ticker {ticker} from {start_year} to {end_year}")
-
     # Validate start year and end year as integers
     if not (start_year.isdigit() and end_year.isdigit()):
         return "Start Year and End Year must be integers.", 400
 
-    # Call the existing Python script with the user input   
-    output = StartReport(ticker, int(start_year), int(end_year), userid)
-    filename = output.split('/')[-1]
-    # Return a link to the generated file for downloading
-    
-    return render_template('header.html', title='Report') + render_template('download.html', userid=userid, output=output, filename=filename)
+    # Call the existing Python script with the user input
+    script_path = 'GenerateReport.py'  # Update this with the correct path
+    # Build the command to run the script
+    command = [
+        sys.executable,  # Use the Python executable from the current environment
+        '-c', 'import sys, os; sys.path.append(os.path.dirname(sys.argv[1])); ' +
+        f'from {os.path.basename(script_path).replace(".py", "")} import main; ' +
+        'main()',  # Import and run the main function in the script
+        script_path,  # Path to the script
+        ticker,
+        start_year,
+        end_year,
+        userid
+    ]
 
-@app.route('/download/<path:filename>')
-def download_file(filename):
+    result = subprocess.run(command, capture_output=True, text=True)
+    output = result.stdout.strip()
+    # Return a link to the generated file for downloading
+    return f'File generated. <a href="/download_file?filename={output}">Download File: {output}</a>'
+
+@app.route('/download_file')
+def download_file():
     # Specify the path to the generated file
-    directory = 'reports'  # Update this with the correct path
-    #filename = request.args.get('filename')
+    file_path = 'C://Development/PY/reports/'  # Update this with the correct path
+    filename = request.args.get('filename')
     # Return the file for download
     try:
-        return send_from_directory(directory, filename, as_attachment=True)
-        #(file_path, filename=filename, )
+        return send_from_directory("reports", filename)
+        #(file_path, filename=filename, as_attachment=True)
     except Exception as e:
         print(f"Error: {e}")
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=8080, debug=True)
+    app.run(debug=True)

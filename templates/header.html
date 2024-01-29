@@ -11,7 +11,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding-top: 60px;  
             background-color: #f4f4f4;
         }
 
@@ -41,7 +41,7 @@
     <header>       
     </header>
     <nav>
-        <a href="/homepage">Homepage</a>
-        <a href="/generate_report">Generate Report</a>
+        <a href="/about">Homepage</a>
+        <a href="/report/{{session.get('userid', None)}}">Generate Report</a>
         <a href="/logout">Logout</a>
     </nav>
