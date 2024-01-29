@@ -19,6 +19,7 @@ import sqlite3
 import os
 import sys
 from datetime import datetime
+import logging
 
 db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'reports.db')
 
@@ -105,24 +106,24 @@ def CheckForFile(ticker, filename):
 
 #Main Code
 # Prompt the user for a ticker symbol
-def main():
-    ticker_symbol = sys.argv[2]
-    start_year = int(sys.argv[3])
-    end_year = int(sys.argv[4])
+def StartReport(ticker_symbol, start_year, end_year, userid):
+    logging.info('Starting report for %s', ticker_symbol)
     statement_types = 'BS,CF,PL'
-    userid = sys.argv[5]
     reportRoot = 'reports/'
-    os.chdir (reportRoot)
+    print(f"Current Working Directory: {os.getcwd()}")
+    parentDir = 'c:\Development\PY'
+    os.chdir (parentDir + '/' + reportRoot)
+    
     years = list(range(start_year, end_year + 1))
     years_str = ','.join(map(str, years)) # Convert the list of years to a comma-separated string
     curdate = datetime.now().strftime('%Y%m%d')
     filename = ticker_symbol + '_' + str(start_year) + '_' + str(end_year) + '.xlsx'
     file_id = check_file_exists(ticker_symbol, filename)
-
+    logging.info('File ID: %s', file_id)
+    
     if file_id is not None:
         SaveUserData(userid, file_id)
-        print(ticker_symbol + '/' + filename)
-        sys.exit()    
+        return ticker_symbol + '/' + filename
 
     if not os.path.exists(ticker_symbol):
         os.makedirs(ticker_symbol)
@@ -130,17 +131,18 @@ def main():
 
     # Construct the full path with /{curdate}/{filename}
     # Construct the URL with the user's input
-    url = f"https://backend.simfin.com/api/v3/companies/statements/compact?ticker={ticker_symbol}&statements={statement_types}&period=FY&fyear={years_str}"
+    url = f"https://prod.simfin.com/api/v3/companies/statements/compact?ticker={ticker_symbol}&statements={statement_types}&period=FY&fyear={years_str}"
 
     headers = {
     "accept": "application/json",
     "Authorization": "b1c124d9-f078-4887-abb9-d3504b54b23b"
     }
 
-
+    logging.debug('URL: %s', url)
     response = requests.get(url, headers=headers)
     jsonStr = json.loads(response.text)
-
+    logging.debug('data returned from API call')
+    
     data = jsonStr[0]['statements']
     arrDataFrames = np.empty(len(data), dtype=object)
     arrNames = np.empty(len(data), dtype=object)
@@ -448,8 +450,10 @@ def main():
             cell.fill = PatternFill(start_color="1A759C", end_color="1A759C", fill_type="solid")  
 
     fileId = SaveFile(ticker_symbol, filename)
+    logging.info(f"File ID: {fileId}, File name: {filename}, full path: {fullPath}")
     SaveUserData(userid, fileId)
-    print(fullPath)
+    os.chdir (parentDir)
+    return fullPath
 
 if __name__ == "__main__":
     print ('hi')

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Page</title>
+    <style>
+        div {
+            max-width: 300px; /* Adjust the maximum width as needed */
+            margin: auto; /* Center the form on the page */
+        }
+
+        .content {
+            text-align: center;
+            padding-top: 60px;          
+        }
+
+        a {
+            color: #3498db; /* Blue link color */
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: #2ecc71; /* Green button color */
+            color: #ffffff; /* White button text color */
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 0px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #27ae60; /* Darker green on hover */
+        }
+        .note {
+            font-style: italic;
+            font-size: small;
+            color: #777; /* Less dark font color */
+        }
+        .filename {
+            font-size: 14px;
+            color: #0db5df; /* Slightly darker font color */
+            font-style: italic;
+        }
+    </style>
+    <script>
+        function downloadAndRedirect() {
+            // Simulate the download link click
+            var downloadLink = document.getElementById("downloadLink");
+            downloadLink.click();
+
+            // Redirect to the home page after a short delay
+            setTimeout(function () {
+                window.location.href = "/report/{{userid}}";  // Replace "/" with the actual path to your home page
+            }, 2000);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="content">
+    <p><span class="filename">{{filename}}</span> is ready for <br></p>
+    <a id="downloadLink" href="/download/{{output}}" style="display: none;" download>Download File</a>
+    <button onclick="downloadAndRedirect()">Download</button>
+
+    <p class="note">Note: The download link opens in a new window, and the page redirects after a short delay.</p>
+    </div>
+</body>
+
+</html>
