@@ -111,7 +111,7 @@ def StartReport(ticker_symbol, start_year, end_year, userid):
     statement_types = 'BS,CF,PL'
     reportRoot = 'reports/'
     print(f"Current Working Directory: {os.getcwd()}")
-    parentDir = 'c:\Development\PY'
+    parentDir = os.getcwd()
     os.chdir (parentDir + '/' + reportRoot)
     
     years = list(range(start_year, end_year + 1))
@@ -131,7 +131,7 @@ def StartReport(ticker_symbol, start_year, end_year, userid):
 
     # Construct the full path with /{curdate}/{filename}
     # Construct the URL with the user's input
-    url = f"https://prod.simfin.com/api/v3/companies/statements/compact?ticker={ticker_symbol}&statements={statement_types}&period=FY&fyear={years_str}"
+    url = f"https://backend.simfin.com/api/v3/companies/statements/compact?ticker={ticker_symbol}&statements={statement_types}&period=FY&fyear={years_str}"
 
     headers = {
     "accept": "application/json",
@@ -456,7 +456,6 @@ def StartReport(ticker_symbol, start_year, end_year, userid):
     return fullPath
 
 if __name__ == "__main__":
-    print ('hi')
-    #main()
+    main()
 
 
