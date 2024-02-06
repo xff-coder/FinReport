@@ -112,7 +112,8 @@ def StartReport(ticker_symbol, start_year, end_year, userid):
     reportRoot = 'reports/'
     print(f"Current Working Directory: {os.getcwd()}")
     parentDir = os.getcwd()
-    os.chdir (parentDir + '/' + reportRoot)
+    if not "report" in parentDir:       
+        os.chdir (parentDir + '/' + reportRoot)
     
     years = list(range(start_year, end_year + 1))
     years_str = ','.join(map(str, years)) # Convert the list of years to a comma-separated string
@@ -456,6 +457,7 @@ def StartReport(ticker_symbol, start_year, end_year, userid):
     return fullPath
 
 if __name__ == "__main__":
-    main()
+    print ('hi')
+    #main()
 
 
