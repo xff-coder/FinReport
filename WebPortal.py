@@ -87,13 +87,16 @@ def login():
 def logout():
     # Expire the session to logout
     session.pop('userid', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
+    invitationCode = request.form.get('invitationcode')
+    if invitationCode != '0209dr@gon2024' :
+        return render_template('header.html', title='Homepage') + render_template('index.html', message="Invalid invitation code. Access denied.")
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -123,7 +126,6 @@ def generate_file(userid):
     ticker = request.form.get('ticker')
     start_year = request.form.get('start_year')
     end_year = request.form.get('end_year')
-    statement_types = request.form.getlist('statement_types')
 
     app.logger.info(f"User {userid} generated a file for ticker {ticker} from {start_year} to {end_year}")
 
