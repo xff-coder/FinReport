@@ -50,11 +50,15 @@
             color: #fff;
             cursor: pointer;
         }
+
+        .warning {
+            color: red
+        }
     </style>
 </head>
 <body>
     <h2>Login</h2>
-    <span>{{message}}<br></span>
+    <span class="warning">{{message}}<br></span>
     <form action="/login" method="post">
         <label for="username">Username:</label>
         <input type="text" name="username" required><br>
@@ -71,6 +75,8 @@
         <input type="password" name="password" required><br>
         <label for="email">Email:</label>
         <input type="email" name="email" required><br>
+        <label for="invitationcode">Invitation Code:</label>
+        <input type="text" name="invitationcode" required><br>
         <input type="submit" value="Sign Up">
     </form>
 </body>
